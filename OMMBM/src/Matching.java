@@ -10,12 +10,40 @@ import java.util.Iterator;
 /** Computes the offline matching and online matching using 
    Dijkstra's algorithm and dual weights. Calculates the Competitive Ratio
    to evaluate the performance of our online algorithm.
-   
+
     @author prathyush
-**/
+ **/
 
 public class Matching {
+	private double[][] costMatrix;
 	
+	/** A function to compute the cost matrix from the datasource
+	 * 
+	 */
+	public void generateCostMatrix(int numSetA)
+	{
+		SyntheticData sd = new SyntheticData();
+		this.costMatrix = sd.generateSynthetic1D(numSetA);
+	}
+	
+	/** A function to print the cost matrix 
+	 * 
+	 */
+	public void printCostMatrix()
+	{
+		System.out.println("===============================================");
+		System.out.println("This is the cost matrix");
+		System.out.println("===============================================");
+		for(int i = 0; i < costMatrix.length; i++)
+		{
+			for(int j = 0; j < costMatrix[i].length; j++)
+			{
+				System.out.print(costMatrix[i][j]+"\t");
+			}
+			System.out.println("\n");
+		}
+	}
+
 	/**
 	 * Generates a randomized list of request or destination indices for the
 	 * online algorithm to utilize.
@@ -37,9 +65,9 @@ public class Matching {
 
 		return destinationIndices;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Helper method that checks if two DirectedEdges are equal to each other.
 	 * To, from and weight attributes must equal in both objects.
@@ -64,8 +92,8 @@ public class Matching {
 
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Helper method that checks if an ArrayList of DirectedEdges contains an
 	 * edge.
@@ -86,7 +114,7 @@ public class Matching {
 		return false;
 	}
 
-	
+
 	/**
 	 * Calculates the total net cost of the matching computed by the selected
 	 * algorithm
@@ -102,7 +130,7 @@ public class Matching {
 		}
 		return testCost;
 	}
-	
+
 	/**
 	 * Builds the Element ArrayList when given a cost matrix
 	 * 
@@ -122,11 +150,34 @@ public class Matching {
 		}
 		return elementList;
 	}
+
+	/**
+	 * Builds the EdgeWeightedDigraph when given a cost matrix
+	 * 
+	 * @param costMatrix
+	 *            A simple 2-D array representing the costs between edges
+	 * @return The EdgeWeightedDigraph; simply a bipartite graph with all
+	 *         vertices, edges and weights associated in one data structure
+	 */
+	public static EdgeWeightedgraph constructDigraphFromMatrix(double[][] costMatrix) {
+		EdgeWeightedgraph diGraph = new EdgeWeightedgraph(costMatrix.length
+				+ costMatrix[0].length);
+		
+		ArrayList<Element> elements = buildElementMatrix(costMatrix);
+
+		for (Element ele : elements) {
+			DirectedEdge edge = null;
+			if (ele.getWeight() < 0) {
+				edge = new DirectedEdge(ele.getY(), ele.getX(), ele.getWeight());
+			} else {
+				edge = new DirectedEdge(ele.getX(), ele.getY(), ele.getWeight());
+			}
+			diGraph.addEdge(edge);
+		}
+		return diGraph;
+	}
 	
-	
-	
-	
-	
+
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
 	 * the offline setting.
@@ -156,7 +207,7 @@ public class Matching {
 		boolean runNegativeCycleIndices = false;
 
 		// Construct a DiGraph from the original costmatrix
-		//EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
+		EdgeWeightedgraph original = constructDigraphFromMatrix(costMatrix);
 
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		for (int i = 0; i < numSetA; i++) {
@@ -201,7 +252,7 @@ public class Matching {
 			int source = sourceIndices.get(index);
 
 			// Run BellmanFord algorithm on source index
-			//BellmanFordSP sp = new BellmanFordSP(original, source);
+			BellmanFordSP sp = new BellmanFordSP(original, source);
 
 			Iterator<DirectedEdge> iter = null;
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
@@ -209,32 +260,32 @@ public class Matching {
 			double minPath = Double.MAX_VALUE;
 
 			// Obtain minimum cost path
-			//for (int v = numSetA; v < original.V(); v++) {
+			for (int v = numSetA; v < original.V(); v++) {
 
 				// If vertex is already in the matching, skip it
-				//if (matching.contains(v)) {
-				//	continue;
-			//	}
+				if (matching.contains(v)) {
+					continue;
+				}
 
 				// Check if vertex causes a negative cycle
-			//	if (sp.hasNegativeCycle()) {
-				//	negativeCycleIndex.add(index);
-					//index++;
-				//	break;
-			//	}
+				if (sp.hasNegativeCycle()) {
+					negativeCycleIndex.add(index);
+					index++;
+					break;
+				}
 
 				// Check if a path exists from source vertex to destination
 				// vertex v
-			//	if (sp.hasPathTo(v)) {
-				//	if (sp.distTo(v) < minPath) {
-					//	minPath = sp.distTo(v);
-						//iter = sp.pathTo(v).iterator();
-				//	}
-			//	}
+				if (sp.hasPathTo(v)) {
+					if (sp.distTo(v) < minPath) {
+						minPath = sp.distTo(v);
+						iter = sp.pathTo(v).iterator();
+					}
+				}
 			}
 
 			// Negative cycle detected, don't process current index
-		/*	if (iter == null) {
+			if (iter == null) {
 				if (runNegativeCycleIndices) {
 					index = numSetA;
 				}
@@ -246,7 +297,7 @@ public class Matching {
 			}
 
 			// New iteration DiGraph that will have updated edges
-			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(numSetA
+			EdgeWeightedgraph nextIterationGraph = new EdgeWeightedgraph(numSetA
 					+ costMatrix[0].length);
 
 			// Update matchings and new DiGraph
@@ -281,11 +332,30 @@ public class Matching {
 				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1.0 * edge.weight()));
 			}
 		}
-   */
+
 		double totalCost = calculateTotalCost(offlineMatching);
 
 		return totalCost;
 	}
 
+	
+	
+	/**
+	 * Computes the smallest cost matching using the Hungarian algorithm. For
+	 * verification purposes.
+	 * 
+	 * @return The net total cost of the optimal matching found by executing
+	 *         Hungarian algorithm.
+	 */
+	public double verifyHungarian() {
+		HungarianAlgorithm test = new HungarianAlgorithm(costMatrix);
 
+		int[] tester = test.execute();
+		double totalCost = 0;
+		for (int i = 0; i < tester.length; i++) {
+			totalCost += costMatrix[i][tester[i]];
+		}
+		return totalCost;
+	}
+	
 }
