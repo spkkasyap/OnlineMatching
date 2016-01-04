@@ -14,11 +14,11 @@ public class Driver {
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		System.out.println("Start: " + dateFormat.format(cal.getTime()));
-		
+		System.out.println("Number of nodes in each set : "+numNodes);
 		Matching m = new Matching();
 		m.generateCostMatrix(numNodes);
-		m.printCostMatrix();
-		m.computeOfflineMatching(numNodes);
+		//m.printCostMatrix();
+		System.out.println("The cost of matching produced by offline matching is : "+m.computeOfflineMatching(numNodes));
 		
 		//Calculating the cost of matching produced by Hungarian Algorithm
 		double hungarian_cost = m.verifyHungarian();

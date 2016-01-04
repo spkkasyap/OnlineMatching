@@ -159,8 +159,8 @@ public class Matching {
 	 * @return The EdgeWeightedDigraph; simply a bipartite graph with all
 	 *         vertices, edges and weights associated in one data structure
 	 */
-	public static EdgeWeightedgraph constructDigraphFromMatrix(double[][] costMatrix) {
-		EdgeWeightedgraph diGraph = new EdgeWeightedgraph(costMatrix.length
+	public static EdgeWeightedDigraph constructDigraphFromMatrix(double[][] costMatrix) {
+		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(costMatrix.length
 				+ costMatrix[0].length);
 		
 		ArrayList<Element> elements = buildElementMatrix(costMatrix);
@@ -207,7 +207,7 @@ public class Matching {
 		boolean runNegativeCycleIndices = false;
 
 		// Construct a DiGraph from the original costmatrix
-		EdgeWeightedgraph original = constructDigraphFromMatrix(costMatrix);
+		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
 
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		for (int i = 0; i < numSetA; i++) {
@@ -297,7 +297,7 @@ public class Matching {
 			}
 
 			// New iteration DiGraph that will have updated edges
-			EdgeWeightedgraph nextIterationGraph = new EdgeWeightedgraph(numSetA
+			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(numSetA
 					+ costMatrix[0].length);
 
 			// Update matchings and new DiGraph
@@ -333,6 +333,7 @@ public class Matching {
 			}
 		}
 
+		System.out.println(offlineMatching);
 		double totalCost = calculateTotalCost(offlineMatching);
 
 		return totalCost;
