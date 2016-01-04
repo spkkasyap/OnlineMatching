@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 
 /** Computes the offline matching and online matching using 
@@ -396,6 +397,50 @@ public class Matching {
 		return totalCost;
 	}
 
+	
+	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices){
+		double totalCost = 0.0;
+		
+		//multiplier constant 't' 
+		double t = 2;
+		
+		// online matching
+		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
+		
+		// offline matching
+		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
+		
+		// Dual weights of the vertices
+		ArrayList<Integer> dualWeights = new ArrayList<Integer>();
+		
+		// Set of free servers in S
+		TreeSet<Integer> freeServers = new TreeSet<Integer>();
+		
+		// Initialize dual weights of all vertices, y(.) = 0 for every vertex
+		for(int i = 0; i < 2*numSetA; i++)
+		{
+			dualWeights.add(0);
+		}
+		System.out.println("Dual weights of vertices: \n"+dualWeights);
+		
+		// Initialize free servers to true for all servers
+		for(int i = 0; i < numSetA; i++)
+			freeServers.add(i);
+		System.out.println("Free Servers : "+freeServers);
+		
+		// Add source indices to the list
+		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
+		for (int i = 0; i < numSetA; i++) {
+			sourceIndices.add(i);
+		}
+		
+		System.out.println(sourceIndices);
+		
+		
+		
+		
+		return totalCost;
+	}
 
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in

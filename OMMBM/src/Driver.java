@@ -72,8 +72,12 @@ public class Driver {
 		this.cr_grbyoff = (this.cost_greedy)/(this.cost_offline);
 		bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
 		
+		m.computeOnlineMatchingDW(numNodes, destinationIndices);
+		
+		
 		cal = Calendar.getInstance();
 		bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
+		
 		bw.close();
 		System.out.println("Check the output file");
 	}
