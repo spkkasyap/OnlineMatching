@@ -397,8 +397,6 @@ public class Matching {
 	}
 
 
-
-
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
 	 * the online setting.
@@ -552,11 +550,53 @@ public class Matching {
 
 	}
 
+	/**
+	 * Computes the greedy matching for a given cost matrix. Simply goes down
+	 * the column of the cost matrix based on the order dictated by the
+	 * destinationIndices ArrayList and finds the lowest cost element that is
+	 * not already in the matching. Adds that edge to the matching and
+	 * continues.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @param destinationIndices
+	 *            The ArrayList of randomized destination indices
+	 * @return The total net cost of the greedy matching
+	 */
+	public double computeGreedyMatching(int numSetA, ArrayList<Integer> destinationIndices) {
+		// Final greedy matching
+		ArrayList<DirectedEdge> matching = new ArrayList<DirectedEdge>();
 
+		// Store set A node indices that are in the matching
+		ArrayList<Integer> fromMatchings = new ArrayList<Integer>();
 
+		// Index of the current source node being processed
+		int index = 0;
 
+		while (matching.size() < numSetA) {
+			// Get row of smallest element in column of destination index
+			double min = Double.MAX_VALUE;
+			DirectedEdge minEdge = null;
 
+			for (int i = 0; i < costMatrix.length; i++) {
+				int destinationIndex = destinationIndices.get(index) - numSetA;
+				double cost = costMatrix[i][destinationIndex];
+				DirectedEdge edge = new DirectedEdge(i, destinationIndices.get(index), cost);
 
+				if (!fromMatchings.contains(edge.from()) && edge.weight() < min) {
+					min = cost;
+					minEdge = edge;
+				}
+			}
+			matching.add(minEdge);
+			fromMatchings.add(minEdge.from());
+			index++;
+		}
+
+		double totalCost = calculateTotalCost(matching);
+
+		return totalCost;
+	}
 
 	/**
 	 * Computes the smallest cost matching using the Hungarian algorithm. For
