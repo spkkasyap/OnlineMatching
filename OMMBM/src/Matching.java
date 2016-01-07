@@ -397,51 +397,57 @@ public class Matching {
 		return totalCost;
 	}
 
-	
+
 	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices){
-		double totalCost = 0.0;
-		
-		//multiplier constant 't' 
-		double t = 2;
-		
-		// online matching
-		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
-		
-		// offline matching
-		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
-		
-		// Dual weights of the vertices
-		ArrayList<Integer> dualWeights = new ArrayList<Integer>();
-		
-		// Set of free servers in S
+		double costOnline = 0.0; //total cost of our online matching
+		double costOffline = 0.0; //total cost of the offline matching which is t-feasible 
+		double t = 2; 	//multiplier constant 't' 
+
+		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>(); //online matching: M
+		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>(); //offline matching: M*
+		ArrayList<Double> dualWeights = new ArrayList<Double>(); //Dual weights of the vertices: y(.) t-feasible
+
+		EdgeWeightedgraph residualGraph = new EdgeWeightedgraph(2*numSetA); //residual graph G_{M_{*}}
+
+		//Set of free servers in S with respect to online matching M : S_{F}
 		TreeSet<Integer> freeServers = new TreeSet<Integer>();
-		
-		// Initialize dual weights of all vertices, y(.) = 0 for every vertex
+
+		//Initialize dual weights of all vertices, y(.) = 0 for every vertex
 		for(int i = 0; i < 2*numSetA; i++)
 		{
-			dualWeights.add(0);
+			dualWeights.add(0.0);
+			// Initialize free servers to true for all servers
+			if(i < numSetA)
+				freeServers.add(i);
 		}
 		System.out.println("Dual weights of vertices: \n"+dualWeights);
-		
-		// Initialize free servers to true for all servers
-		for(int i = 0; i < numSetA; i++)
-			freeServers.add(i);
 		System.out.println("Free Servers : "+freeServers);
-		
 		// Add source indices to the list
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		for (int i = 0; i < numSetA; i++) {
 			sourceIndices.add(i);
 		}
-		
 		System.out.println(sourceIndices);
-		
-		
-		
-		
-		return totalCost;
-	}
 
+		// Initial construction of residual graph
+		for(int i = numSetA; i < 2*numSetA; i++)
+			for(int j = 0; j < numSetA; j++)
+			{
+				double cost = this.costMatrix[j][i-numSetA] - dualWeights.get(i) - dualWeights.get(j);
+				DirectedEdge edge = new DirectedEdge(i, j, cost);
+				residualGraph.addEdge(edge);
+			}
+		System.out.println("The initial residual graph is: \n"+residualGraph.toString());
+		System.out.println("The destination indices order : "+destinationIndices);
+		
+		Dijkstras d = new Dijkstras(2*numSetA, 6);
+		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
+		System.out.println("The shortest path tree : \n"+spt.toString()); 
+	
+		return costOnline;
+	}
+	
+	
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
 	 * the online setting.

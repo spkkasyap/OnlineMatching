@@ -74,7 +74,6 @@ public class Driver {
 		
 		m.computeOnlineMatchingDW(numNodes, destinationIndices);
 		
-		
 		cal = Calendar.getInstance();
 		bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
 		

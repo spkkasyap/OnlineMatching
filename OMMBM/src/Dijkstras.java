@@ -78,19 +78,27 @@ public class Dijkstras {
 	 * in the distance[.] for every vertex .
 	 * @param g ; the edge weighted directed graph
 	 */
-	public void dsp_algorithm(EdgeWeightedgraph g)
+	public EdgeWeightedgraph dsp_algorithm(EdgeWeightedgraph g)
 	{
 		//double round_min = Double.MAX_VALUE;
 		//double overall_min = Double.MAX_VALUE;
 		//Graph shortestPathTree  = new Graph();
-		EdgeWeightedgraph spt = new EdgeWeightedgraph(g.V());
 		
+		EdgeWeightedgraph spt = new EdgeWeightedgraph(g.V());
+
 		for(int count = 0; count < g.V(); count++)
 		{
 			int u = this.minDistant();
 			this.unvisited.remove(u);
 			this.visited[u] = true;
-			
+
+			//System.out.println("The vertex visited is : "+u);
+			if(g.adjacentTo(u) == null)
+			{
+				//System.out.println("u is : "+u+" and has no neighbors");
+				break;
+			}
+
 			Iterator<DirectedEdge> it = g.adjacentTo(u).iterator();
 			while(it.hasNext())
 			{
@@ -107,13 +115,17 @@ public class Dijkstras {
 					this.distance[v] = weight+this.distance[u];
 				}
 			}
-			
+
 		}
-		
-		System.out.println("\n\nShortest Path Tree :"+spt.toString());
-		this.printSolution();
-		
-		for(int i = 0; i < this.visited.length; i++)
+
+		//System.out.println("\n\nShortest Path Tree :"+spt.toString());
+		//this.printSolution();
+
+		/* for(int i = 0; i < this.visited.length; i++)
 			System.out.println(visited[i]);
+		*/
+
+		return spt;
 	}
+
 }
