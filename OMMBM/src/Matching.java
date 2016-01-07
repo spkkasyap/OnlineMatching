@@ -440,14 +440,14 @@ public class Matching {
 		System.out.println("The initial residual graph is: \n"+residualGraph.toString());
 		System.out.println("The destination indices order : "+destinationIndices);
 		
-		Dijkstras d = new Dijkstras(2*numSetA, 6);
+		Dijkstras d = new Dijkstras(2*numSetA, destinationIndices.get(0));
 		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
 		System.out.println("The shortest path tree : \n"+spt.toString());
-		int destination = d.minDistFreeServer(freeServers, 6);
-		System.out.println("the closest server to our request 6 is :"+destination);
+		int destination = d.minDistFreeServer(freeServers, destinationIndices.get(0));
+		System.out.println("the closest server to our request "+destinationIndices.get(0)+" is :"+destination);
 		
 		ShortestPath s = new ShortestPath();
-		s.computeMinCostPath(spt, 6, destination);
+		s.computeMinCostPath(spt, destinationIndices.get(0), destination);
 		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
 		
 		return costOnline;
