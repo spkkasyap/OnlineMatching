@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 /** This is a class designed to incorporate the algorithm 
  * and some of its outputs for our use in online matching
@@ -60,6 +61,36 @@ public class Dijkstras {
 		return min_distant;
 	}
 
+	/** A function to find the minimum distant free server from the dijkstra's
+	 * shortest path tree
+	 * 
+	 * @param freeServers
+	 * @return destination
+	 */
+	public int minDistFreeServer(TreeSet<Integer> freeServers, int src)
+	{
+		int dest = src;
+		double minCost = Double.MAX_VALUE;
+		System.out.println("The free servers are : "+freeServers);
+		
+		for(int i = 0; i < this.distance.length; i++)
+		{
+			if(i == src) //if the vertex on focus is our source skip the loop
+				continue;
+			if(distance[i] < minCost)
+			{
+				if(freeServers.contains(i))
+					{
+						minCost = distance[i];
+						dest = i;
+					}
+			}
+		}
+		
+		return dest;
+	}
+
+	
 	/** A function to display the final shortest distances from a given
 	 * source vertex to every other vertex in the graph.
 	 */

@@ -442,8 +442,14 @@ public class Matching {
 		
 		Dijkstras d = new Dijkstras(2*numSetA, 6);
 		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
-		System.out.println("The shortest path tree : \n"+spt.toString()); 
-	
+		System.out.println("The shortest path tree : \n"+spt.toString());
+		int destination = d.minDistFreeServer(freeServers, 6);
+		System.out.println("the closest server to our request 6 is :"+destination);
+		
+		ShortestPath s = new ShortestPath();
+		s.computeMinCostPath(spt, 6, destination);
+		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
+		
 		return costOnline;
 	}
 	

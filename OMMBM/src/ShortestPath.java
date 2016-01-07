@@ -1,5 +1,7 @@
 /** A class to find the minimum t-net-cost augmenting path and the 
  * minimum cost
+ * 
+ * @author prathyush
  */
 
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class ShortestPath {
 			this.minCostPath.add(it.next());
 		}
 	}
-	
+
 	/** A function to get the minimum cost 
 	 * 
 	 * @return minimum cost of the shortest path
@@ -57,15 +59,52 @@ public class ShortestPath {
 	{
 		return this.minCost;
 	}
-	
+
 	/** A function to get the shortest path
 	 * 
-	 * @return the minimun 
+	 * @return the minimum cost augmenting path
 	 */
 	public ArrayList<DirectedEdge> getMinCostPath()
 	{
 		return this.minCostPath;
 	}
+
+	public void computeMinCostPath(EdgeWeightedgraph spt, int src, int dest)
+	{
+		ArrayList<DirectedEdge> neighborsOfSrc = spt.adjacentTo(src);
+		Iterator<DirectedEdge> it = neighborsOfSrc.iterator();
+		ArrayList<DirectedEdge> temp;
+
+		while(it.hasNext())
+		{
+			DirectedEdge currentEdge= it.next();
+			int currentNeighbor = currentEdge.to();
+			temp = new ArrayList<DirectedEdge>();
+			temp.add(currentEdge);
+			System.out.println("current neighbor : "+currentNeighbor);
+			
+			if(currentNeighbor == dest)
+			{
+				this.minCostPath.addAll(temp);
+				return;
+			}
+			
+			while(spt.adjacentTo(currentNeighbor) != null)
+			{
+				Iterator<DirectedEdge> it1 = spt.adjacentTo(currentNeighbor).iterator();
+				currentEdge = it1.next();
+				currentNeighbor = currentEdge.to();
+				temp.add(currentEdge);
+				System.out.println("current neighbor : "+currentNeighbor);
+				if(currentNeighbor == dest)
+					{
+						this.minCostPath.addAll(temp);
+						return;
+					}
+			}
+		}
+	}
+
 
 
 }
