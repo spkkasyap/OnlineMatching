@@ -433,13 +433,35 @@ public class Matching {
 		for(int i = numSetA; i < 2*numSetA; i++)
 			for(int j = 0; j < numSetA; j++)
 			{
-				double cost = this.costMatrix[j][i-numSetA] - dualWeights.get(i) - dualWeights.get(j);
+				double cost = t * this.costMatrix[j][i-numSetA] - dualWeights.get(i) - dualWeights.get(j);
 				DirectedEdge edge = new DirectedEdge(i, j, cost);
 				residualGraph.addEdge(edge);
 			}
 		System.out.println("The initial residual graph is: \n"+residualGraph.toString());
 		System.out.println("The destination indices order : "+destinationIndices);
 		
+		int destIndexCurrent = 0; //initialize the current destination to 0
+		
+		while(destIndexCurrent < numSetA) //until there are no more requests to be processed
+		{
+			int request = destinationIndices.get(destIndexCurrent);
+			
+			//Finding the free server that can process the request with minimum t-net-cost
+			Dijkstras d = new Dijkstras(2*numSetA, request);
+			EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
+			int nearFreeServer = d.minDistFreeServer(freeServers, request);
+			System.out.println("Nearest free server for request "+request+" is "+nearFreeServer);
+			
+			//Finding the minimum t-net-cost augmenting path
+			ShortestPath s = new ShortestPath();
+			s.computeMinCostPath(spt, request, nearFreeServer);
+			System.out.println("The minimum cost augmenting path for iteration "+destIndexCurrent+" is "+s.getMinCostPath());
+			
+			freeServers.remove(nearFreeServer);
+			destIndexCurrent++;
+		}
+	
+		/** Experimentation 
 		Dijkstras d = new Dijkstras(2*numSetA, destinationIndices.get(0));
 		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
 		System.out.println("The shortest path tree : \n"+spt.toString());
@@ -449,6 +471,7 @@ public class Matching {
 		ShortestPath s = new ShortestPath();
 		s.computeMinCostPath(spt, destinationIndices.get(0), destination);
 		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
+		**/
 		
 		return costOnline;
 	}
