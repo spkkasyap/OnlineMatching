@@ -439,44 +439,131 @@ public class Matching {
 			}
 		System.out.println("The initial residual graph is: \n"+residualGraph.toString());
 		System.out.println("The destination indices order : "+destinationIndices);
-		
+
 		int destIndexCurrent = 0; //initialize the current destination to 0
-		
+
 		while(destIndexCurrent < numSetA) //until there are no more requests to be processed
 		{
 			int request = destinationIndices.get(destIndexCurrent);
-			
+
 			//Finding the free server that can process the request with minimum t-net-cost
 			Dijkstras d = new Dijkstras(2*numSetA, request);
 			EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
 			int nearFreeServer = d.minDistFreeServer(freeServers, request);
 			System.out.println("Nearest free server for request "+request+" is "+nearFreeServer);
-			
+
 			//Finding the minimum t-net-cost augmenting path
 			ShortestPath s = new ShortestPath();
 			s.computeMinCostPath(spt, request, nearFreeServer);
 			System.out.println("The minimum cost augmenting path for iteration "+destIndexCurrent+" is "+s.getMinCostPath());
-			
-			freeServers.remove(nearFreeServer);
+
+			//Updating dual weights before augmenting offline matching
+			for(int i = 0; i < 2*numSetA; i++)
+			{
+				if((d.getDistanceOfX(i) < s.getMinCost()) && i >= numSetA)
+				{
+					double newWeight = dualWeights.get(i) + s.getMinCost() - d.getDistanceOfX(i); 
+					dualWeights.set(i, newWeight);
+				}
+				else if((d.getDistanceOfX(i) < s.getMinCost()) && i < numSetA)
+				{
+					double newWeight = dualWeights.get(i) -s.getMinCost() + d.getDistanceOfX(i);
+					dualWeights.set(i, newWeight);
+				}
+			}
+
+			//Updating the Offline Matching by Augmenting with minimum t-net-cost path P
+			Iterator<DirectedEdge> it = s.getMinCostPath().iterator();
+			while(it.hasNext())
+			{
+				DirectedEdge e = it.next();
+
+				if(offlineMatching.contains(e)) //if offline matching contains the edge in P remove it
+				{
+					offlineMatching.remove(e);
+				}
+				else // if it doesn't add it to the matching
+				{
+					offlineMatching.add(e);
+				}
+
+				//updating dual weights of vertices in R intersection P say request1 with new weights
+				int request1 = e.to();
+				int server1 = e.from();
+				if(server1 >= numSetA)
+				{
+					double newWeight = dualWeights.get(request1) - (t-1)*(this.costMatrix[server1-numSetA][request1]);
+					dualWeights.set(request1, newWeight);
+				}
+				else
+				{
+					double newWeight = dualWeights.get(request1) - (t-1)*(this.costMatrix[server1][request1-numSetA]);
+					dualWeights.set(request1, newWeight);
+				}
+			}
+
+			//Updating the Online Matching
+			DirectedEdge e = new DirectedEdge(nearFreeServer, request, this.costMatrix[nearFreeServer][request-numSetA]);
+			onlineMatching.add(e);
+			costOnline = costOnline+e.weight(); //update the costOnline
+
+			freeServers.remove(nearFreeServer); //remove the server assigned in online matching from free servers list
+
+			//updating the weighted residual graph
+			Iterator<DirectedEdge> it1 = residualGraph.edges().iterator();
+			while(it1.hasNext())
+			{
+				int flag = 0; //if flag is 0, then to-numSetA, else from-numSetA is to be used
+				DirectedEdge e1 = it1.next();
+				int from = e1.from();
+				int to = e1.to();
+				
+				if(from >= numSetA)
+					flag = 1; 
+
+				double newWeight;
+				if(offlineMatching.contains(e1))
+				{
+					if(flag == 1)
+						newWeight = this.costMatrix[from-numSetA][to] - dualWeights.get(from) - dualWeights.get(to);
+					else
+						newWeight = this.costMatrix[from][to-numSetA] - dualWeights.get(from) - dualWeights.get(to);
+					DirectedEdge e2 = new DirectedEdge(from, to, newWeight);
+					residualGraph.removeEdge(e1);
+					residualGraph.addEdge(e2);
+				}
+
+				else
+				{
+					if(flag == 1)
+						newWeight = t * this.costMatrix[from-numSetA][to] - dualWeights.get(from) - dualWeights.get(to);
+					else
+						newWeight = t * this.costMatrix[from][to-numSetA] - dualWeights.get(from) - dualWeights.get(to);
+					residualGraph.reverseDirection(from, to, newWeight);
+				}
+			}
+
+
 			destIndexCurrent++;
 		}
-	
+
 		/** Experimentation 
 		Dijkstras d = new Dijkstras(2*numSetA, destinationIndices.get(0));
 		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
 		System.out.println("The shortest path tree : \n"+spt.toString());
 		int destination = d.minDistFreeServer(freeServers, destinationIndices.get(0));
 		System.out.println("the closest server to our request "+destinationIndices.get(0)+" is :"+destination);
-		
+
 		ShortestPath s = new ShortestPath();
 		s.computeMinCostPath(spt, destinationIndices.get(0), destination);
 		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
-		**/
-		
+		 **/
+
+		System.out.println("The online algorithm cost is "+costOnline);
 		return costOnline;
 	}
-	
-	
+
+
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
 	 * the online setting.

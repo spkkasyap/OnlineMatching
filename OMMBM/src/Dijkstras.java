@@ -39,6 +39,11 @@ public class Dijkstras {
 		}
 	}
 
+	public double getDistanceOfX(int x)
+	{
+		return this.distance[x];
+	}
+	
 	/** A function to find out the vertex which is closest to the source vertex
 	 * from the unvisited vertices and return it
 	 * @return min_distant; the minimum distant vertex from source
@@ -69,25 +74,27 @@ public class Dijkstras {
 	 */
 	public int minDistFreeServer(TreeSet<Integer> freeServers, int src)
 	{
-		int dest = src;
+		int dest = 0;
+		int dest_final;
+		
 		double minCost = Double.MAX_VALUE;
 		System.out.println("The free servers are : "+freeServers);
 		
-		for(int i = 0; i < this.distance.length; i++)
+		Iterator<Integer> it = freeServers.iterator();
+		
+		while(it.hasNext())
 		{
-			if(i == src) //if the vertex on focus is our source skip the loop
-				continue;
-			if(distance[i] < minCost)
+			int source = it.next();
+			
+			if(this.distance[source] < minCost)
 			{
-				if(freeServers.contains(i))
-					{
-						minCost = distance[i];
-						dest = i;
-					}
+				minCost = this.distance[source];
+				dest = source;
 			}
 		}
 		
-		return dest;
+		dest_final = dest;
+		return dest_final;
 	}
 
 	

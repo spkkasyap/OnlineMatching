@@ -154,7 +154,7 @@ public class EdgeWeightedgraph {
 	 * @param w
 	 * @param weight
 	 */
-	public void reverseDirection(int v, int w, int weight)
+	public void reverseDirection(int v, int w, double weight)
 	{
 		DirectedEdge e = null;
 		Iterator<DirectedEdge> it = this.adjacentTo(v).iterator();
@@ -171,7 +171,7 @@ public class EdgeWeightedgraph {
 		this.removeEdge(e);
 		DirectedEdge e1 = new DirectedEdge(w, v, weight);
 		this.addEdge(e1);
-		System.out.println("E at this point "+E);
+		//System.out.println("E at this point "+E);
 	}
 
 	/** A function to write down the entire directed graph as a string
