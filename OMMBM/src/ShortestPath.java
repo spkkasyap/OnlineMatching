@@ -15,7 +15,7 @@ public class ShortestPath {
 	 */
 	public ShortestPath()
 	{
-		minCost = Double.MAX_VALUE;
+		minCost = 0;
 		minCostPath = new ArrayList<DirectedEdge>();
 	}
 
@@ -23,7 +23,7 @@ public class ShortestPath {
 	 * 
 	 * @param x
 	 */
-	public void setMinCost(int x)
+	public void setMinCost(double x)
 	{
 		this.minCost = x;
 	}
@@ -57,6 +57,14 @@ public class ShortestPath {
 	 */
 	public double getMinCost()
 	{
+		double cost = 0.0;
+		Iterator<DirectedEdge> it = this.minCostPath.iterator();
+		while(it.hasNext())
+		{
+			DirectedEdge e = it.next();
+			cost = cost + e.weight();
+		}
+		this.setMinCost(cost);
 		return this.minCost;
 	}
 
@@ -92,14 +100,17 @@ public class ShortestPath {
 			while(spt.adjacentTo(currentNeighbor) != null)
 			{
 				Iterator<DirectedEdge> it1 = spt.adjacentTo(currentNeighbor).iterator();
-				currentEdge = it1.next();
-				currentNeighbor = currentEdge.to();
-				temp.add(currentEdge);
-				//System.out.println("current neighbor : "+currentNeighbor);
-				if(currentNeighbor == dest)
+				while(it1.hasNext())
 				{
-					this.minCostPath.addAll(temp);
-					return;
+					currentEdge = it1.next();
+					currentNeighbor = currentEdge.to();
+					temp.add(currentEdge);
+					//System.out.println("current neighbor : "+currentNeighbor);
+					if(currentNeighbor == dest)
+					{
+						this.minCostPath.addAll(temp);
+						return;
+					}
 				}
 			}
 		}

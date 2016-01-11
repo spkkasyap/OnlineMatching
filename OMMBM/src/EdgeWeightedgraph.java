@@ -114,6 +114,7 @@ public class EdgeWeightedgraph {
 	 */
 	public void removeInto(int u)
 	{
+		ArrayList<DirectedEdge> toRemove = new ArrayList<DirectedEdge>();
 		for(int i =0; i < this.V(); i++)
 		{
 			if(this.adjacentTo(i) != null)
@@ -124,11 +125,18 @@ public class EdgeWeightedgraph {
 					DirectedEdge e = it.next();
 					if(e.to() == u)
 					{
-						this.removeEdge(e);
+						toRemove.add(e);
 					}
 				}
 			}
 		}
+		Iterator<DirectedEdge> it1 = toRemove.iterator();
+		while(it1.hasNext())
+		{
+			DirectedEdge e1 = it1.next();
+			this.removeEdge(e1);
+		}
+			
 	}
 
 	/** A function to remove an edge from the graph. This method requires to 
