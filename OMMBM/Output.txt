@@ -1,0 +1,10 @@
+Start: 06:23:12
+Number of nodes in each set : 500
+The cost of matching produced by offline matching is : 110153.0
+The cost of matching produced by Hungarian Algorithm is : 110153.0
+The cost of matching produced by Online Greedy Algorithm is : 131313.0
+Competitive Ratio: greedy/offline : 1.1920964476682432
+End: 06:28:21
+ced by Online Greedy Algorithm is : 78798.0
+Competitive Ratio: greedy/offline : 1.3852888435709012
+End: 06:27:46

@@ -43,7 +43,7 @@ public class Dijkstras {
 	{
 		return this.distance[x];
 	}
-	
+
 	/** A function to find out the vertex which is closest to the source vertex
 	 * from the unvisited vertices and return it
 	 * @return min_distant; the minimum distant vertex from source
@@ -76,28 +76,28 @@ public class Dijkstras {
 	{
 		int dest = 0;
 		int dest_final;
-		
+
 		double minCost = Double.MAX_VALUE;
-		System.out.println("The free servers are : "+freeServers);
-		
+		//System.out.println("The free servers are : "+freeServers);
+
 		Iterator<Integer> it = freeServers.iterator();
-		
+
 		while(it.hasNext())
 		{
 			int source = it.next();
-			
+
 			if(this.distance[source] < minCost)
 			{
 				minCost = this.distance[source];
 				dest = source;
 			}
 		}
-		
+
 		dest_final = dest;
 		return dest_final;
 	}
 
-	
+
 	/** A function to display the final shortest distances from a given
 	 * source vertex to every other vertex in the graph.
 	 */
@@ -121,7 +121,7 @@ public class Dijkstras {
 		//double round_min = Double.MAX_VALUE;
 		//double overall_min = Double.MAX_VALUE;
 		//Graph shortestPathTree  = new Graph();
-		
+
 		EdgeWeightedgraph spt = new EdgeWeightedgraph(g.V());
 
 		for(int count = 0; count < g.V(); count++)
@@ -161,7 +161,7 @@ public class Dijkstras {
 
 		/* for(int i = 0; i < this.visited.length; i++)
 			System.out.println(visited[i]);
-		*/
+		 */
 
 		return spt;
 	}

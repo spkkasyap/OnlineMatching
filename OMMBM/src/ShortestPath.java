@@ -81,26 +81,26 @@ public class ShortestPath {
 			int currentNeighbor = currentEdge.to();
 			temp = new ArrayList<DirectedEdge>();
 			temp.add(currentEdge);
-			System.out.println("current neighbor : "+currentNeighbor);
-			
+			//System.out.println("current neighbor : "+currentNeighbor);
+
 			if(currentNeighbor == dest)
 			{
 				this.minCostPath.addAll(temp);
 				return;
 			}
-			
+
 			while(spt.adjacentTo(currentNeighbor) != null)
 			{
 				Iterator<DirectedEdge> it1 = spt.adjacentTo(currentNeighbor).iterator();
 				currentEdge = it1.next();
 				currentNeighbor = currentEdge.to();
 				temp.add(currentEdge);
-				System.out.println("current neighbor : "+currentNeighbor);
+				//System.out.println("current neighbor : "+currentNeighbor);
 				if(currentNeighbor == dest)
-					{
-						this.minCostPath.addAll(temp);
-						return;
-					}
+				{
+					this.minCostPath.addAll(temp);
+					return;
+				}
 			}
 		}
 	}

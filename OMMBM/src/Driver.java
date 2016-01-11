@@ -55,7 +55,8 @@ public class Driver {
 		destinationIndices = m.permuteDestinations(numNodes);
 		
 		this.cost_offline = m.computeOfflineMatching(numNodes);
-		this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
+		this.cost_online = m.computeOnlineMatchingDW(numNodes, destinationIndices);
+		//this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
 		this.cr_onbyoff = (this.cost_online)/(this.cost_offline);
 
 		bw.write("The cost of matching produced by offline matching is : "+this.cost_offline+"\n");
@@ -71,8 +72,6 @@ public class Driver {
 		bw.write("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
 		this.cr_grbyoff = (this.cost_greedy)/(this.cost_offline);
 		bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
-		
-		m.computeOnlineMatchingDW(numNodes, destinationIndices);
 		
 		cal = Calendar.getInstance();
 		bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
