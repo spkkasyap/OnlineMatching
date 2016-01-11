@@ -401,12 +401,13 @@ public class Matching {
 	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices){
 		double costOnline = 0.0; //total cost of our online matching
 		double costOffline = 0.0; //total cost of the offline matching which is t-feasible 
-		double t = 1; 	//multiplier constant 't' 
+		double t = 10; 	//multiplier constant 't' 
 
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>(); //online matching: M
-		EdgeWeightedgraph offlineMatching = new EdgeWeightedgraph(2*numSetA); //offline matching: M*
+		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>(); //offline matching: M*
 		ArrayList<Double> dualWeights = new ArrayList<Double>(); //Dual weights of the vertices: y(.) t-feasible
 
+		
 		EdgeWeightedgraph residualGraph = new EdgeWeightedgraph(2*numSetA); //residual graph G_{M_{*}}
 
 		//Set of free servers in S with respect to online matching M : S_{F}
@@ -456,21 +457,23 @@ public class Matching {
 			//Finding the minimum t-net-cost augmenting path
 			ShortestPath s = new ShortestPath();
 			s.computeMinCostPath(spt, request, nearFreeServer);
-			System.out.println("The minimum cost augmenting path for iteration "+destIndexCurrent+" is "+s.getMinCostPath().size());
+			//System.out.println("The minimum cost augmenting path for iteration "+destIndexCurrent+" is "+s.getMinCostPath().size());
 
 			System.out.println("current d "+s.getMinCost());
 			//Updating dual weights before augmenting offline matching
 			for(int i = 0; i < 2*numSetA; i++)
 			{
-				System.out.println("Current distance of "+i+" is "+d.getDistanceOfX(i));
+				System.out.println("Current distance d_v of "+i+" is "+d.getDistanceOfX(i));
 				if((d.getDistanceOfX(i) < s.getMinCost()) && (i >= numSetA))
 				{
 					double newWeight = dualWeights.get(i) + s.getMinCost()- d.getDistanceOfX(i); 
+					System.out.println("update dual weight for "+i);
 					dualWeights.set(i, newWeight);
 				}
 				else if((d.getDistanceOfX(i) < s.getMinCost()) && (i < numSetA))
 				{
 					double newWeight = dualWeights.get(i) -s.getMinCost() + d.getDistanceOfX(i);
+					System.out.println("update dual weight for "+i);
 					dualWeights.set(i, newWeight);
 				}
 			}
@@ -485,37 +488,53 @@ public class Matching {
 				DirectedEdge e = it.next();
 				int from = e.from();
 				int to = e.to();
+				//double weight = e.weight();
 				
 				if(count1 % 2 == 1) //edge previously not in offline Matching
 				{
 					double newWeight = this.costMatrix[to][from-numSetA];
 					DirectedEdge e1 = new DirectedEdge(to, from, newWeight);
-					offlineMatching.addEdge(e1);
+					offlineMatching.add(e1);
+					
 				}
 				else //edge previously in offline matching
 				{
-					offlineMatching.removeInto(to);
+					Iterator<DirectedEdge> omIterator = offlineMatching.iterator();
+					while(omIterator.hasNext())
+					{
+						DirectedEdge omEdge = omIterator.next();
+						int omFrom = omEdge.from();
+						int omTo = omEdge.to();
+						if(omFrom == from && omTo == to)
+						{
+							System.out.println("could remove");
+							offlineMatching.remove(omEdge);
+							break;
+						}
+					}
+					count1++;
 				}
 				
+				//System.out.println("The offline Matching "+offlineMatching.toString());
 
 				//updating dual weights of vertices in R intersection P say request1 with new weights
-				int request1 = e.to();
-				int server1 = e.from();
-				if(server1 >= numSetA)
+				int toUpdate = e.to();
+				int fromUpdate = e.from();
+				if(toUpdate >= numSetA)
 				{
-					double newWeight = dualWeights.get(request1) - (t-1)*(this.costMatrix[server1-numSetA][request1]);
-					dualWeights.set(request1, newWeight);
+					double newWeight = dualWeights.get(toUpdate) - (t-1)*(this.costMatrix[fromUpdate][toUpdate-numSetA]);
+					dualWeights.set(toUpdate, newWeight);
 				}
 				else
 				{
-					double newWeight = dualWeights.get(request1) - (t-1)*(this.costMatrix[server1][request1-numSetA]);
-					dualWeights.set(request1, newWeight);
+					double newWeight = dualWeights.get(fromUpdate) - (t-1)*(this.costMatrix[toUpdate][fromUpdate-numSetA]);
+					dualWeights.set(fromUpdate, newWeight);
 				}
 				count1++;
 			}
 
 
-			//System.out.println("Current Dual Weights "+dualWeights);
+			System.out.println("Current Dual Weights "+dualWeights);
 
 			//Updating the Online Matching
 			DirectedEdge e = new DirectedEdge(nearFreeServer, request, this.costMatrix[nearFreeServer][request-numSetA]);
@@ -580,9 +599,19 @@ public class Matching {
 		s.computeMinCostPath(spt, destinationIndices.get(0), destination);
 		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
 		 **/
-
+		//System.out.println("Offline matching "+offlineMatching);
+		//Iterator<DirectedEdge> offlineIt = offlineMatching.iterator();
+		/** while(offlineIt.hasNext())
+		{
+			DirectedEdge offEdge = offlineIt.next();
+			//System.out.println("Edge weight is "+offEdge.weight());
+			costOffline = costOffline + offEdge.weight(); 
+		}
+		**/
+		
 		System.out.println("The online Matching "+onlineMatching);
-		System.out.println("The online algorithm cost is "+costOnline);
+		//System.out.println("The offline matching cost is "+costOffline);
+		System.out.println("The online matching cost is "+costOnline);
 		return costOnline;
 	}
 
