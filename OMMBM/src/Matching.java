@@ -430,7 +430,8 @@ public class Matching {
 				DirectedEdge edge = new DirectedEdge(i, j, cost);
 				residualGraph.addEdge(edge);
 			}
-
+		
+		System.out.println("Initial Residual graph "+residualGraph.toString());
 		System.out.println("The destination indices order : "+destinationIndices);
 
 		int destIndexCurrent = 0; //initialize the current destination to 0
@@ -463,6 +464,7 @@ public class Matching {
 			//Updating dual weights before augmenting offline matching
 			for(int i = 0; i < 2*numSetA; i++)
 			{
+				//System.out.println("d["+i+"] is "+d.distTo(i));
 				if((d.distTo(i) < minCost) && (i >= numSetA)) // if i is in R and its shortest distance to request < minCost
 				{
 					double newWeight = dualWeights.get(i) + minCost - d.distTo(i); 
@@ -512,7 +514,7 @@ public class Matching {
 						}
 					}
 				}
-				System.out.println("Offline matching size "+offlineMatching.size());
+				
 				count1++;
 			}
 
@@ -616,6 +618,9 @@ public class Matching {
 				residualGraph.addEdge(ed);
 			}
 			System.out.println("The number of edges residual graph is "+residualGraph.E());
+			System.out.println("Offline matching size "+offlineMatching.size());
+			System.out.println("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching)));
+			System.out.println("========================================================================");
 			
 			destIndexCurrent++;
 		}
@@ -632,21 +637,57 @@ public class Matching {
 		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
 		 **/
 		System.out.println("Offline matching size "+offlineMatching.size());
-		Iterator<DirectedEdge> offlineIt = offlineMatching.iterator();
-		while(offlineIt.hasNext())
-		{
-			DirectedEdge offEdge = offlineIt.next();
-			//System.out.println("Edge weight is "+offEdge.weight());
-			costOffline = costOffline + offEdge.weight(); 
-		}
-
+		costOffline = calculateCost(offlineMatching);
 
 		System.out.println("The online Matching "+onlineMatching);
 		System.out.println("The offline matching cost is "+costOffline);
 		System.out.println("The online matching cost is "+costOnline);
 		return costOnline;
 	}
+	
+	/** A function to calculate the cost of a matching
+	 * 
+	 * @param matching
+	 * @return cost; of the matching
+	 */
+	public double calculateCost(ArrayList<DirectedEdge> matching)
+	{
+		double cost = 0.0;
+		
+		Iterator<DirectedEdge> it = matching.iterator();
+		while(it.hasNext())
+		{
+			DirectedEdge e = it.next();
+			cost = cost + e.weight();
+		}
+		
+		return cost;
+	}
 
+	/** A function to check the validity of the dual weights
+	 * 
+	 * @param dualWeights
+	 * @param offlineMatching
+	 * @return
+	 */
+	public boolean validityCheck(ArrayList<Double> dualWeights, double offlineCost)
+	{
+		boolean validity = false;
+		double sumOfDualWeights = 0.0;
+		
+		//Find sum of the dual weights
+		for(Double d : dualWeights)
+		{
+			sumOfDualWeights = sumOfDualWeights + d;
+		}
+		
+		if(sumOfDualWeights == offlineCost)
+			validity = true;
+		
+		return validity;
+	}
+	
+	
 
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
