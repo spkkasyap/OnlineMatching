@@ -572,7 +572,7 @@ public class Matching {
 		//System.out.println("The online Matching "+onlineMatching);
 		s1.append("The offline matching cost is "+costOffline+"\n");
 		s1.append("The online matching cost is "+costOnline+"\n");
-		s1.append("The competitive ratio: online/ offline "+cronbyoff);
+		s1.append("The competitive ratio: online/ offline "+cronbyoff+"\n");
 		
 		bw.write(s.toString());
 		bw.close();

@@ -39,17 +39,16 @@ public class Driver {
 	 * @param constant
 	 * @throws IOException 
 	 */
-	public void generateSingleRun(int numNodes, String dataSource, int constant) throws IOException {
+	public String generateSingleRun(int numNodes, String dataSource, int constant) throws IOException {
 		StringBuilder s = new StringBuilder();
 		ArrayList<Integer> destinationIndices;
-		BufferedWriter bw = new BufferedWriter(new FileWriter("Output.txt"));
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
-		
+
 		s.append("Start: " + dateFormat.format(cal.getTime())+"\n");
 		s.append("Number of nodes in each set : "+numNodes+"\n");
-		s.append("The constant t is "+constant);
-		
+		s.append("The constant t is "+constant+"\n");
+
 		//bw.write("Start: " + dateFormat.format(cal.getTime())+"\n");
 		//bw.write("Number of nodes in each set : "+numNodes+"\n");
 
@@ -58,7 +57,7 @@ public class Driver {
 
 		//m.printCostMatrix();
 		destinationIndices = m.permuteDestinations(numNodes);
-		
+
 		//this.cost_offline = m.computeOfflineMatching(numNodes);
 		s.append(m.computeOnlineMatchingDW(numNodes, destinationIndices, constant));
 		//this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
@@ -73,28 +72,39 @@ public class Driver {
 		this.cost_hungarian = m.verifyHungarian();
 		s.append("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
 		//bw.write("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
-		
+
 		//Calculating the cost of online greedy matching
 		this.cost_greedy = m.computeGreedyMatching(numNodes, destinationIndices);
 		s.append("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
 		//bw.write("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
-		this.cr_grbyoff = (this.cost_greedy)/(this.cost_offline);
-		s.append("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
+		this.cr_grbyoff = (this.cost_greedy)/(this.cost_hungarian);
+		s.append("Competitive Ratio: greedy/hungarian : "+this.cr_grbyoff+"\n");
 		//bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
-		
+
 		cal = Calendar.getInstance();
 		s.append("End: " + dateFormat.format(cal.getTime())+"\n");
 		//bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
-		
-		bw.write(s.toString());
-		bw.close();
-		System.out.println("Check the output file");
+		return s.toString();
 	}
 
 
 	public static void main(String args[]) throws NumberFormatException, IOException
 	{
+		BufferedWriter bw = new BufferedWriter(new FileWriter("Output.txt"));
+		StringBuilder s = new StringBuilder();
 		Driver driver = new Driver();
-		driver.generateSingleRun(Integer.parseInt(args[0]), null, Integer.parseInt(args[1]));
+		int t = 1;
+		int count = 1;
+		while(t <= 1000000)
+		{
+			System.out.println("Run : "+count);
+			s.append(driver.generateSingleRun(Integer.parseInt(args[0]), null, t));
+			s.append("================================END OF A RUN==============================\n");
+			t = t*10;
+			count++;
+		}
+		bw.write(s.toString());
+		System.out.println("Check the output files: Output.txt and Details.txt");
+		bw.close();
 	}
 }
