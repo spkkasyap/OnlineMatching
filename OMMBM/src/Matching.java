@@ -430,7 +430,7 @@ public class Matching {
 				DirectedEdge edge = new DirectedEdge(i, j, cost);
 				residualGraph.addEdge(edge);
 			}
-		
+
 		System.out.println("Initial Residual graph "+residualGraph.toString());
 		System.out.println("The destination indices order : "+destinationIndices);
 
@@ -506,15 +506,14 @@ public class Matching {
 						DirectedEdge omEdge = omIterator.next();
 						int omFrom = omEdge.from();
 						int omTo = omEdge.to();
-						if(omFrom == from && omTo == to)
+						if((omFrom == from && omTo == to) || (omFrom == to && omTo == from))
 						{
-							//System.out.println("could remove");
 							offlineMatching.remove(omEdge);
 							break;
 						}
 					}
 				}
-				
+
 				count1++;
 			}
 
@@ -528,6 +527,39 @@ public class Matching {
 
 			// updating the residual graph
 			EdgeWeightedDigraph tempResidualGraph = new EdgeWeightedDigraph(2*numSetA);
+			// construct a map for the offline matched vertices a:b;  if a is mapped to b in the matching 
+			HashMap<Integer, Integer> offlineMatchMap = new HashMap<Integer, Integer>();
+			Iterator<DirectedEdge> omIterator = offlineMatching.iterator();
+			while(omIterator.hasNext())
+			{
+				DirectedEdge omEdge = omIterator.next();
+				offlineMatchMap.put(omEdge.from(), omEdge.to());
+			}
+
+			System.out.println("construction of the next iteration residual graph: ");
+			for(int i = 0; i < numSetA; i++)
+				for(int j = numSetA; j < 2*numSetA; j++)
+				{
+					//System.out.println("looking at "+i+" "+j+" pair ");
+					if(offlineMatchMap.containsKey(i) && offlineMatchMap.get(i) == j) // i->j is in offline Matching
+					{
+						double weight = this.costMatrix[i][j-numSetA] -dualWeights.get(i) - dualWeights.get(j);
+						DirectedEdge edge = new DirectedEdge(i, j, weight);
+						tempResidualGraph.addEdge(edge);
+					}
+					else
+					{
+						double weight = t * this.costMatrix[i][j-numSetA] - dualWeights.get(i) - dualWeights.get(j);
+						DirectedEdge edge = new DirectedEdge(j, i, weight);
+						tempResidualGraph.addEdge(edge);
+					}
+				}
+			residualGraph = tempResidualGraph;
+
+
+
+
+			/**EdgeWeightedDigraph tempResidualGraph = new EdgeWeightedDigraph(2*numSetA);
 			int count = 1;
 
 			HashMap<Integer, Integer> trgMap = new HashMap<Integer, Integer>();
@@ -617,25 +649,17 @@ public class Matching {
 				DirectedEdge ed = trgEdge.next();
 				residualGraph.addEdge(ed);
 			}
-			System.out.println("The number of edges residual graph is "+residualGraph.E());
+			 **/
+
+			//System.out.println("The number of edges residual graph is "+residualGraph.E());
+			System.out.println("The next Iteration residual graph is "+residualGraph);
 			System.out.println("Offline matching size "+offlineMatching.size());
 			System.out.println("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching)));
 			System.out.println("========================================================================");
-			
+
 			destIndexCurrent++;
 		}
 
-		/** Experimentation 
-		Dijkstras d = new Dijkstras(2*numSetA, destinationIndices.get(0));
-		EdgeWeightedgraph spt = d.dsp_algorithm(residualGraph);
-		System.out.println("The shortest path tree : \n"+spt.toString());
-		int destination = d.minDistFreeServer(freeServers, destinationIndices.get(0));
-		System.out.println("the closest server to our request "+destinationIndices.get(0)+" is :"+destination);
-
-		ShortestPath s = new ShortestPath();
-		s.computeMinCostPath(spt, destinationIndices.get(0), destination);
-		System.out.println("Shortest Path to destination  is :\n"+s.getMinCostPath());
-		 **/
 		System.out.println("Offline matching size "+offlineMatching.size());
 		costOffline = calculateCost(offlineMatching);
 
@@ -644,7 +668,7 @@ public class Matching {
 		System.out.println("The online matching cost is "+costOnline);
 		return costOnline;
 	}
-	
+
 	/** A function to calculate the cost of a matching
 	 * 
 	 * @param matching
@@ -653,14 +677,14 @@ public class Matching {
 	public double calculateCost(ArrayList<DirectedEdge> matching)
 	{
 		double cost = 0.0;
-		
+
 		Iterator<DirectedEdge> it = matching.iterator();
 		while(it.hasNext())
 		{
 			DirectedEdge e = it.next();
 			cost = cost + e.weight();
 		}
-		
+
 		return cost;
 	}
 
@@ -674,20 +698,20 @@ public class Matching {
 	{
 		boolean validity = false;
 		double sumOfDualWeights = 0.0;
-		
+
 		//Find sum of the dual weights
 		for(Double d : dualWeights)
 		{
 			sumOfDualWeights = sumOfDualWeights + d;
 		}
-		
+
 		if(sumOfDualWeights == offlineCost)
 			validity = true;
-		
+
 		return validity;
 	}
-	
-	
+
+
 
 	/**
 	 * Computes the smallest cost matching using the Bellman ford algorithm in
