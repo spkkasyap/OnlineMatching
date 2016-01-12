@@ -399,10 +399,10 @@ public class Matching {
 	}
 
 
-	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices){
+	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices, double constant){
 		double costOnline = 0.0; //total cost of our online matching
 		double costOffline = 0.0; //total cost of the offline matching which is t-feasible 
-		double t = 2; 	//multiplier constant 't' 
+		double t = constant; 	//multiplier constant 't' 
 
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>(); //online matching: M
 		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>(); //offline matching: M*
@@ -431,8 +431,8 @@ public class Matching {
 				residualGraph.addEdge(edge);
 			}
 
-		System.out.println("Initial Residual graph "+residualGraph.toString());
-		System.out.println("The destination indices order : "+destinationIndices);
+		//System.out.println("Initial Residual graph "+residualGraph.toString());
+		//System.out.println("The destination indices order : "+destinationIndices);
 
 		int destIndexCurrent = 0; //initialize the current destination to 0
 
@@ -482,7 +482,7 @@ public class Matching {
 
 			//Updating the Offline Matching by Augmenting with minimum t-net-cost path P
 			int count1 = 1;
-			System.out.println("shortest cost path "+minCostPath);
+			//System.out.println("shortest cost path "+minCostPath);
 
 			for(DirectedEdge e : minCostPath)
 			{
@@ -517,7 +517,7 @@ public class Matching {
 				count1++;
 			}
 
-			System.out.println("Current Dual Weights "+dualWeights);
+			//System.out.println("Current Dual Weights "+dualWeights);
 
 			//Updating the Online Matching & its cost & removing the recently matched server from free servers
 			DirectedEdge e = new DirectedEdge(nearFreeServer, request, this.costMatrix[nearFreeServer][request-numSetA]);
@@ -556,103 +556,8 @@ public class Matching {
 				}
 			residualGraph = tempResidualGraph;
 
-
-
-
-			/**EdgeWeightedDigraph tempResidualGraph = new EdgeWeightedDigraph(2*numSetA);
-			int count = 1;
-
-			HashMap<Integer, Integer> trgMap = new HashMap<Integer, Integer>();
-
-			for(DirectedEdge spEdge : minCostPath)
-			{
-				int spFrom = spEdge.from();
-				int spTo = spEdge.to();
-
-				if(count%2 == 1) //edge is not in offline matching earlier but is now
-				{
-					double newWeight;
-					if(spFrom >= numSetA)
-						newWeight = this.costMatrix[spTo][spFrom-numSetA] - dualWeights.get(spTo) - dualWeights.get(spFrom);
-					else
-						newWeight = this.costMatrix[spFrom][spTo-numSetA] - dualWeights.get(spTo) - dualWeights.get(spFrom);
-					DirectedEdge modEdge = new DirectedEdge(spTo, spFrom, newWeight);
-					tempResidualGraph.addEdge(modEdge);
-					trgMap.put(spTo, spFrom);
-				}
-				else //edge is in offline matching earlier but not now
-				{
-					double newWeight;
-					if(spFrom >= numSetA)
-						newWeight = t * this.costMatrix[spTo][spFrom-numSetA] - dualWeights.get(spTo) - dualWeights.get(spFrom);
-					else
-						newWeight = t * this.costMatrix[spFrom][spTo-numSetA] - dualWeights.get(spTo) - dualWeights.get(spFrom);
-					DirectedEdge modEdge = new DirectedEdge(spTo, spFrom, newWeight);
-					tempResidualGraph.addEdge(modEdge);
-					trgMap.put(spTo, spFrom);
-				}
-				count++;
-
-			}
-
-			Iterator<DirectedEdge> omEdges = offlineMatching.iterator();
-			while(omEdges.hasNext())
-			{
-				DirectedEdge omEdge = omEdges.next();
-				int omFrom = omEdge.from();
-				int omTo = omEdge.to();
-
-				if( (trgMap.containsKey(omFrom) && trgMap.get(omFrom) == omTo) || 
-						(trgMap.containsKey(omTo) && trgMap.get(omTo) == omFrom) ) 
-					continue;
-				else //edges in matching but not in intersection with augmenting path
-				{
-					double updateWeight = this.costMatrix[omFrom][omTo-numSetA] - dualWeights.get(omFrom) - dualWeights.get(omTo);
-					DirectedEdge updateEdge = new DirectedEdge(omFrom, omTo, updateWeight);
-					tempResidualGraph.addEdge(updateEdge);
-					trgMap.put(omFrom, omTo);
-				}	
-			}
-
-			Iterator<DirectedEdge> rgEdges = residualGraph.edges().iterator();
-			while(rgEdges.hasNext())
-			{
-				DirectedEdge rgEdge = rgEdges.next();
-				int rgFrom = rgEdge.from();
-				int rgTo = rgEdge.to();
-				if( (trgMap.containsKey(rgFrom) && trgMap.get(rgFrom) == rgTo) || 
-						(trgMap.containsKey(rgTo) && trgMap.get(rgTo) == rgFrom) ) 
-					continue;
-				else
-				{
-					if(rgFrom >= numSetA)
-					{
-						double updateWeight = t * this.costMatrix[rgTo][rgFrom-numSetA] - dualWeights.get(rgFrom) - dualWeights.get(rgTo);
-						DirectedEdge updateEdge = new DirectedEdge(rgFrom, rgTo, updateWeight);
-						tempResidualGraph.addEdge(updateEdge);
-						trgMap.put(rgFrom, rgTo);
-					}
-					else
-					{
-						double updateWeight = t * this.costMatrix[rgFrom][rgTo-numSetA] - dualWeights.get(rgFrom) - dualWeights.get(rgTo);
-						DirectedEdge updateEdge = new DirectedEdge(rgFrom, rgTo, updateWeight);
-						tempResidualGraph.addEdge(updateEdge);
-						trgMap.put(rgFrom, rgTo);
-					}
-				}
-			}
-
-			residualGraph = new EdgeWeightedDigraph(2*numSetA);
-			Iterator<DirectedEdge> trgEdge = tempResidualGraph.edges().iterator(); 
-			while(trgEdge.hasNext())
-			{
-				DirectedEdge ed = trgEdge.next();
-				residualGraph.addEdge(ed);
-			}
-			 **/
-
 			//System.out.println("The number of edges residual graph is "+residualGraph.E());
-			System.out.println("The next Iteration residual graph is "+residualGraph);
+			//System.out.println("The next Iteration residual graph is "+residualGraph);
 			System.out.println("Offline matching size "+offlineMatching.size());
 			System.out.println("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching)));
 			System.out.println("========================================================================");
@@ -663,7 +568,7 @@ public class Matching {
 		System.out.println("Offline matching size "+offlineMatching.size());
 		costOffline = calculateCost(offlineMatching);
 
-		System.out.println("The online Matching "+onlineMatching);
+		//System.out.println("The online Matching "+onlineMatching);
 		System.out.println("The offline matching cost is "+costOffline);
 		System.out.println("The online matching cost is "+costOnline);
 		return costOnline;

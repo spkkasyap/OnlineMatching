@@ -39,12 +39,12 @@ public class Driver {
 	 * @param constant
 	 * @throws IOException 
 	 */
-	public void generateSingleRun(int numNodes, String dataSource, double constant) throws IOException {
+	public void generateSingleRun(int numNodes, String dataSource, int constant) throws IOException {
 		ArrayList<Integer> destinationIndices;
 		BufferedWriter bw = new BufferedWriter(new FileWriter("Output.txt"));
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
-
+		
 		bw.write("Start: " + dateFormat.format(cal.getTime())+"\n");
 		bw.write("Number of nodes in each set : "+numNodes+"\n");
 
@@ -54,14 +54,14 @@ public class Driver {
 		//m.printCostMatrix();
 		destinationIndices = m.permuteDestinations(numNodes);
 		
-		this.cost_offline = m.computeOfflineMatching(numNodes);
-		this.cost_online = m.computeOnlineMatchingDW(numNodes, destinationIndices);
+		//this.cost_offline = m.computeOfflineMatching(numNodes);
+		this.cost_online = m.computeOnlineMatchingDW(numNodes, destinationIndices, constant);
 		//this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
-		this.cr_onbyoff = (this.cost_online)/(this.cost_offline);
+		//this.cr_onbyoff = (this.cost_online)/(this.cost_offline);
 
-		bw.write("The cost of matching produced by offline matching is : "+this.cost_offline+"\n");
+		//bw.write("The cost of matching produced by offline matching is : "+this.cost_offline+"\n");
 		bw.write("The cost of matching produced by online matching is :"+this.cost_online+"\n");
-		bw.write("Competitive Ratio: online/offline : "+this.cr_onbyoff+"\n");
+		//bw.write("Competitive Ratio: online/offline : "+this.cr_onbyoff+"\n");
 
 		//Calculating the cost of matching produced by Hungarian Algorithm
 		this.cost_hungarian = m.verifyHungarian();
@@ -84,6 +84,6 @@ public class Driver {
 	public static void main(String args[]) throws NumberFormatException, IOException
 	{
 		Driver driver = new Driver();
-		driver.generateSingleRun(Integer.parseInt(args[0]), null, 0);
+		driver.generateSingleRun(Integer.parseInt(args[0]), null, Integer.parseInt(args[1]));
 	}
 }
