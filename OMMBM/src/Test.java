@@ -29,7 +29,7 @@ public class Test {
 		
 
 		int V = 4;
-		EdgeWeightedgraph g = new EdgeWeightedgraph(V);
+		EdgeWeightedDigraph g = new EdgeWeightedDigraph(V);
 		
 		DirectedEdge e1 = new DirectedEdge(0, 1, 10);
 		g.addEdge(e1);
@@ -42,7 +42,12 @@ public class Test {
 		DirectedEdge e5 = new DirectedEdge(1, 2, 6);
 		g.addEdge(e5);
 		
-		System.out.println("Number of vertices in the graph : "+g.V());
+	    // compute shortest paths
+        DijkstraSP sp = new DijkstraSP(g, 0);
+        for(int i = 0; i < g.V(); i++)
+        	System.out.println("Distance to "+i+" from 0 "+sp.distTo(i)+" with path "+sp.pathTo(i));
+		
+		/**System.out.println("Number of vertices in the graph : "+g.V());
 		System.out.println("Number of edges in the graph : "+g.E());
 		System.out.println("The indegree of vertex 1 is "+g.indegree(1));
 		System.out.println("The degree of vertex 0 is "+g.outdegree(0));
@@ -63,15 +68,15 @@ public class Test {
 			System.out.println(e.toString());
 		}
 		
-		/** System.out.println("\n\nThe entire graph in the form of a string \n"+g.toString());
+		System.out.println("\n\nThe entire graph in the form of a string \n"+g.toString());
 		g.reverseDirection(3, 1, 5);
 		System.out.println("\n\nThe entire graph in the form of a string \n"+g.toString());
 		System.out.println("The final indegree of 0, 1, 2, 3: "+g.indegree(0)+" "+g.indegree(1)+" "+g.indegree(2)+" "+g.indegree(3));
 		**/
 		
-		Dijkstras dijkstra = new Dijkstras(V, 0);
+		/**Dijkstras dijkstra = new Dijkstras(V, 0);
 		dijkstra.dsp_algorithm(g);
-		
+		**/
 		bw.close();
 	}
 }
