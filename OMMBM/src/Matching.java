@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -399,15 +401,15 @@ public class Matching {
 	}
 
 
-	public double computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices, double constant){
+	public String computeOnlineMatchingDW(int numSetA, ArrayList<Integer> destinationIndices, double constant) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new FileWriter("details.txt"));
+		StringBuilder s = new StringBuilder();
 		double costOnline = 0.0; //total cost of our online matching
 		double costOffline = 0.0; //total cost of the offline matching which is t-feasible 
 		double t = constant; 	//multiplier constant 't' 
-
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>(); //online matching: M
 		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>(); //offline matching: M*
 		ArrayList<Double> dualWeights = new ArrayList<Double>(); //Dual weights of the vertices: y(.) t-feasible
-
 		EdgeWeightedDigraph residualGraph = new EdgeWeightedDigraph(2*numSetA); //residual graph G_{M_{*}}
 
 		//Set of free servers in S with respect to online matching M : S_{F}
@@ -430,10 +432,7 @@ public class Matching {
 				DirectedEdge edge = new DirectedEdge(i, j, cost);
 				residualGraph.addEdge(edge);
 			}
-
-		//System.out.println("Initial Residual graph "+residualGraph.toString());
-		//System.out.println("The destination indices order : "+destinationIndices);
-
+		
 		int destIndexCurrent = 0; //initialize the current destination to 0
 
 		while(destIndexCurrent < numSetA) //until there are no more requests to be processed
@@ -536,7 +535,6 @@ public class Matching {
 				offlineMatchMap.put(omEdge.from(), omEdge.to());
 			}
 
-			System.out.println("construction of the next iteration residual graph: ");
 			for(int i = 0; i < numSetA; i++)
 				for(int j = numSetA; j < 2*numSetA; j++)
 				{
@@ -555,23 +553,30 @@ public class Matching {
 					}
 				}
 			residualGraph = tempResidualGraph;
+			s.append("Constructed the next iteration residual graph\n");
 
 			//System.out.println("The number of edges residual graph is "+residualGraph.E());
 			//System.out.println("The next Iteration residual graph is "+residualGraph);
-			System.out.println("Offline matching size "+offlineMatching.size());
-			System.out.println("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching)));
-			System.out.println("========================================================================");
+			s.append("Offline matching size "+offlineMatching.size()+"\n");
+			s.append("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching))+"\n");
+			s.append("===================================================================================\n");
 
 			destIndexCurrent++;
 		}
 
-		System.out.println("Offline matching size "+offlineMatching.size());
+		s.append("Offline matching size "+offlineMatching.size()+"\n");
 		costOffline = calculateCost(offlineMatching);
 
+		StringBuilder s1 = new StringBuilder();
+		double cronbyoff = costOnline/ costOffline;
 		//System.out.println("The online Matching "+onlineMatching);
-		System.out.println("The offline matching cost is "+costOffline);
-		System.out.println("The online matching cost is "+costOnline);
-		return costOnline;
+		s1.append("The offline matching cost is "+costOffline+"\n");
+		s1.append("The online matching cost is "+costOnline+"\n");
+		s1.append("The competitive ratio: online/ offline "+cronbyoff);
+		
+		bw.write(s.toString());
+		bw.close();
+		return s1.toString();
 	}
 
 	/** A function to calculate the cost of a matching

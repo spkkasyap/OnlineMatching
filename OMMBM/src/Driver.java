@@ -40,13 +40,18 @@ public class Driver {
 	 * @throws IOException 
 	 */
 	public void generateSingleRun(int numNodes, String dataSource, int constant) throws IOException {
+		StringBuilder s = new StringBuilder();
 		ArrayList<Integer> destinationIndices;
 		BufferedWriter bw = new BufferedWriter(new FileWriter("Output.txt"));
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
-		bw.write("Start: " + dateFormat.format(cal.getTime())+"\n");
-		bw.write("Number of nodes in each set : "+numNodes+"\n");
+		s.append("Start: " + dateFormat.format(cal.getTime())+"\n");
+		s.append("Number of nodes in each set : "+numNodes+"\n");
+		s.append("The constant t is "+constant);
+		
+		//bw.write("Start: " + dateFormat.format(cal.getTime())+"\n");
+		//bw.write("Number of nodes in each set : "+numNodes+"\n");
 
 		Matching m = new Matching();
 		m.generateCostMatrix(numNodes);
@@ -55,27 +60,33 @@ public class Driver {
 		destinationIndices = m.permuteDestinations(numNodes);
 		
 		//this.cost_offline = m.computeOfflineMatching(numNodes);
-		this.cost_online = m.computeOnlineMatchingDW(numNodes, destinationIndices, constant);
+		s.append(m.computeOnlineMatchingDW(numNodes, destinationIndices, constant));
 		//this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
 		//this.cr_onbyoff = (this.cost_online)/(this.cost_offline);
 
 		//bw.write("The cost of matching produced by offline matching is : "+this.cost_offline+"\n");
-		bw.write("The cost of matching produced by online matching is :"+this.cost_online+"\n");
+		//s.append("The cost of matching produced by online matching is :"+this.cost_online+"\n");
+		//bw.write("The cost of matching produced by online matching is :"+this.cost_online+"\n");
 		//bw.write("Competitive Ratio: online/offline : "+this.cr_onbyoff+"\n");
 
 		//Calculating the cost of matching produced by Hungarian Algorithm
 		this.cost_hungarian = m.verifyHungarian();
-		bw.write("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
+		s.append("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
+		//bw.write("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
 		
 		//Calculating the cost of online greedy matching
 		this.cost_greedy = m.computeGreedyMatching(numNodes, destinationIndices);
-		bw.write("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
+		s.append("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
+		//bw.write("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
 		this.cr_grbyoff = (this.cost_greedy)/(this.cost_offline);
-		bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
+		s.append("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
+		//bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
 		
 		cal = Calendar.getInstance();
-		bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
+		s.append("End: " + dateFormat.format(cal.getTime())+"\n");
+		//bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
 		
+		bw.write(s.toString());
 		bw.close();
 		System.out.println("Check the output file");
 	}
