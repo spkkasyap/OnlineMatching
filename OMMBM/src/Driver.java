@@ -19,6 +19,7 @@ public class Driver {
 	private double cost_greedy;
 	private double cr_onbyoff;
 	private double cr_grbyoff;
+	private ArrayList<Integer> constants;
 
 	/** A constructor for the driver class
 	 * 
@@ -30,6 +31,16 @@ public class Driver {
 		this.cost_greedy = 0.0;
 		this.cr_onbyoff = 0.0;
 		this.cr_grbyoff = 0.0;
+		this.constants = new ArrayList<Integer>();
+		this.constants.add(1);
+		this.constants.add(3);
+		this.constants.add(5);
+		this.constants.add(10);
+		this.constants.add(100);
+		this.constants.add(1000);
+		this.constants.add(10000);
+		this.constants.add(100000);
+		this.constants.add(1000000);
 	}
 
 	/** A function to generate a single run of the algorithm 
@@ -39,15 +50,15 @@ public class Driver {
 	 * @param constant
 	 * @throws IOException 
 	 */
-	public String generateSingleRun(int numNodes, String dataSource, int constant) throws IOException {
+	public String generateSingleRun(int numNodes, String dataSource) throws IOException {
 		StringBuilder s = new StringBuilder();
 		ArrayList<Integer> destinationIndices;
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 
-		s.append("Start: " + dateFormat.format(cal.getTime())+"\n");
-		s.append("Number of nodes in each set : "+numNodes+"\n");
-		s.append("The constant t is "+constant+"\n");
+		System.out.println("Start: " + dateFormat.format(cal.getTime())+"\n");
+		System.out.println("Number of nodes in each set : "+numNodes+"\n");
+
 
 		//bw.write("Start: " + dateFormat.format(cal.getTime())+"\n");
 		//bw.write("Number of nodes in each set : "+numNodes+"\n");
@@ -57,51 +68,52 @@ public class Driver {
 
 		//m.printCostMatrix();
 		destinationIndices = m.permuteDestinations(numNodes);
+		int run = 1;
+		s.append(numNodes+", ");
+		for(int k = 0; k < this.constants.size(); k++)
+		{
+			int t = this.constants.get(k);
+			System.out.println("The constant t is "+t);
+			s.append(m.computeOnlineMatchingDW(numNodes, destinationIndices, t));
+			if(k < this.constants.size()-1)
+				s.append(", ");
+			//s.append("-----------------------different value of t---------------------\n");
+			System.out.println("Run : "+run+" completed!");
+			run++;
+		}
+		s.append("\n");
 
-		//this.cost_offline = m.computeOfflineMatching(numNodes);
-		s.append(m.computeOnlineMatchingDW(numNodes, destinationIndices, constant));
-		//this.cost_online = m.computeOnlineMatching(numNodes, destinationIndices);
-		//this.cr_onbyoff = (this.cost_online)/(this.cost_offline);
-
-		//bw.write("The cost of matching produced by offline matching is : "+this.cost_offline+"\n");
-		//s.append("The cost of matching produced by online matching is :"+this.cost_online+"\n");
-		//bw.write("The cost of matching produced by online matching is :"+this.cost_online+"\n");
-		//bw.write("Competitive Ratio: online/offline : "+this.cr_onbyoff+"\n");
-
-		//Calculating the cost of matching produced by Hungarian Algorithm
+		//s.append("=================HUNGARIAN AND ONLINE GREEDY RESULTS=====================\n");
 		this.cost_hungarian = m.verifyHungarian();
-		s.append("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
-		//bw.write("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
-
-		//Calculating the cost of online greedy matching
+		//s.append("The cost of matching produced by Hungarian Algorithm is : "+this.cost_hungarian+"\n");
 		this.cost_greedy = m.computeGreedyMatching(numNodes, destinationIndices);
-		s.append("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
-		//bw.write("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
+		//s.append("The cost of matching produced by Online Greedy Algorithm is : "+this.cost_greedy+"\n");
 		this.cr_grbyoff = (this.cost_greedy)/(this.cost_hungarian);
-		s.append("Competitive Ratio: greedy/hungarian : "+this.cr_grbyoff+"\n");
-		//bw.write("Competitive Ratio: greedy/offline : "+this.cr_grbyoff+"\n");
-
+		//s.append("Competitive Ratio: greedy/hungarian : "+this.cr_grbyoff+"\n");
+		
 		cal = Calendar.getInstance();
-		s.append("End: " + dateFormat.format(cal.getTime())+"\n");
-		//bw.write("End: " + dateFormat.format(cal.getTime())+"\n");
+		System.out.println("\nEnd: " + dateFormat.format(cal.getTime())+"\n");
+		System.out.println("==========================END OF A RUN===================================\n");
+
 		return s.toString();
 	}
 
 
 	public static void main(String args[]) throws NumberFormatException, IOException
 	{
+		//set of constant values
 		BufferedWriter bw = new BufferedWriter(new FileWriter("Output.txt"));
 		StringBuilder s = new StringBuilder();
 		Driver driver = new Driver();
-		int t = 1;
-		int count = 1;
-		while(t <= 1000000)
+		for(int j = 0; j < args.length; j++)
 		{
-			System.out.println("Run : "+count);
-			s.append(driver.generateSingleRun(Integer.parseInt(args[0]), null, t));
-			s.append("================================END OF A RUN==============================\n");
-			t = t*10;
-			count++;
+			int k = 1;
+			while(k <= 10)
+				{
+					s.append(driver.generateSingleRun(Integer.parseInt(args[j]), null));
+					k++;
+				}
+			s.append("\n");
 		}
 		bw.write(s.toString());
 		System.out.println("Check the output files: Output.txt and Details.txt");

@@ -553,13 +553,13 @@ public class Matching {
 					}
 				}
 			residualGraph = tempResidualGraph;
-			s.append("Constructed the next iteration residual graph\n");
+			//s.append("Constructed the next iteration residual graph\n");
 
 			//System.out.println("The number of edges residual graph is "+residualGraph.E());
 			//System.out.println("The next Iteration residual graph is "+residualGraph);
-			s.append("Offline matching size "+offlineMatching.size()+"\n");
-			s.append("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching))+"\n");
-			s.append("===================================================================================\n");
+			//s.append("Offline matching size "+offlineMatching.size()+"\n");
+			//s.append("The dual weights are valid : "+validityCheck(dualWeights, calculateCost(offlineMatching))+"\n");
+			//s.append("===================================================================================\n");
 
 			destIndexCurrent++;
 		}
@@ -570,10 +570,11 @@ public class Matching {
 		StringBuilder s1 = new StringBuilder();
 		double cronbyoff = costOnline/ costOffline;
 		//System.out.println("The online Matching "+onlineMatching);
-		s1.append("The offline matching cost is "+costOffline+"\n");
-		s1.append("The online matching cost is "+costOnline+"\n");
-		s1.append("The competitive ratio: online/ offline "+cronbyoff+"\n");
+		s.append("The offline matching cost is "+costOffline+"\n");
+		s.append("The online matching cost is "+costOnline+"\n");
+		s.append("The competitive ratio: online/ offline "+cronbyoff+"\n");
 		
+		s1.append(cronbyoff);
 		bw.write(s.toString());
 		bw.close();
 		return s1.toString();
