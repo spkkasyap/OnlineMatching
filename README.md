@@ -10,3 +10,6 @@ The output(Output.csv) file will have the multiple lines, where each line has th
 (let c.r be the competitive ratio, t be the constant)
 num of nodes, c.r for t=1, c.r for t=3, c.r for t=5, c.r for t=10, c.r for t=100, c.r for t=1000, 
 c.r for t=10000, c.r for t=100000, c.r for t=1000000
+
+#Other Details
+To print other details such as the cost of matching produced by our algorithm as well as the cost of greedy, hungarian, and offline matchings you need to uncomment those lines in the lines that correspond them.
